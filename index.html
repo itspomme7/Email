@@ -1,0 +1,1384 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>邮箱档案册 · itspomme</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #f9f3ea;
+      --bg-deeper: #f4e7d7;
+      --card-bg: rgba(255, 255, 255, 0.86);
+      --card-border: #f3c9a6;
+      --text-main: #4b463f;
+      --text-soft: #7a7166;
+      --accent: #f5b78c;
+      --accent-blue: #7daedc;
+      --accent-red: #e58a8a;
+      --accent-green: #8cbf9f;
+      --accent-orange: #f2a86b;
+      --accent-gray: #c1b6aa;
+      --shadow-soft: 0 18px 40px rgba(150, 120, 90, 0.16);
+      --radius-lg: 18px;
+      --radius-md: 12px;
+      --radius-pill: 999px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui,
+        "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: radial-gradient(circle at top left, #fdf6ed 0, #f9f3ea 45%, #f4e7d7 100%);
+      color: var(--text-main);
+      -webkit-font-smoothing: antialiased;
+      padding: 24px 16px 40px;
+    }
+
+    .page {
+      max-width: 980px;
+      margin: 0 auto;
+    }
+
+    header.page-header {
+      margin-bottom: 24px;
+      padding: 20px 18px;
+      border-radius: var(--radius-lg);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(255, 248, 239, 0.96));
+      border: 1px solid rgba(245, 183, 140, 0.45);
+      box-shadow: var(--shadow-soft);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    header.page-header::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at top left, rgba(255, 213, 175, 0.45) 0, transparent 55%),
+        radial-gradient(circle at bottom right, rgba(196, 223, 255, 0.38) 0, transparent 55%);
+      opacity: 0.9;
+      pointer-events: none;
+    }
+
+    header.page-header-inner {
+      position: relative;
+      z-index: 1;
+    }
+
+    .page-title-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .page-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #f7cf9b, #f1aa7a);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 18px;
+      box-shadow: 0 10px 25px rgba(210, 140, 90, 0.35);
+    }
+
+    h1.page-title {
+      font-size: 22px;
+      letter-spacing: 0.08em;
+      font-weight: 600;
+    }
+
+    .page-subtitle {
+      font-size: 13px;
+      color: var(--text-soft);
+      line-height: 1.7;
+      margin-top: 4px;
+      white-space: pre-line;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .chip {
+      font-size: 12px;
+      padding: 5px 10px;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(120, 90, 60, 0.15);
+      background: rgba(255, 255, 255, 0.85);
+      color: var(--text-soft);
+    }
+
+    nav.top-nav {
+      margin: 20px 0 18px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    nav.top-nav a {
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: var(--radius-pill);
+      text-decoration: none;
+      color: var(--text-soft);
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(184, 160, 130, 0.35);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    nav.top-nav a span.dot {
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      margin-right: 6px;
+      vertical-align: middle;
+    }
+
+    nav.top-nav a.section-outlook .dot { background: var(--accent-blue); }
+    nav.top-nav a.section-gmail .dot { background: var(--accent-red); }
+    nav.top-nav a.section-qq .dot { background: var(--accent-green); }
+    nav.top-nav a.section-apple .dot { background: var(--accent-gray); }
+    nav.top-nav a.section-aliyun .dot { background: var(--accent-blue); }
+    nav.top-nav a.section-sina .dot { background: var(--accent-orange); }
+
+    section.mail-section {
+      margin-bottom: 24px;
+      padding: 18px 14px 18px;
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(230, 190, 150, 0.65);
+      background: rgba(255, 255, 255, 0.9);
+      box-shadow: 0 10px 30px rgba(150, 120, 90, 0.18);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      position: relative;
+    }
+
+    section.mail-section + section.mail-section {
+      margin-top: 12px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .section-badge {
+      font-size: 13px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: var(--radius-pill);
+      color: #fff;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 8px 20px rgba(120, 120, 120, 0.25);
+    }
+
+    .section-badge span.square {
+      width: 10px;
+      height: 10px;
+      border-radius: 3px;
+      background: rgba(255, 255, 255, 0.9);
+    }
+
+    .section-outlook .section-badge {
+      background: linear-gradient(135deg, #6ea8da, #9fc5f5);
+    }
+
+    .section-gmail .section-badge {
+      background: linear-gradient(135deg, #e97373, #f4a0a0);
+    }
+
+    .section-qq .section-badge {
+      background: linear-gradient(135deg, #79b89c, #9dd4b5);
+    }
+
+    .section-apple .section-badge {
+      background: linear-gradient(135deg, #a8aeb8, #c3c8cf);
+    }
+
+    .section-aliyun .section-badge {
+      background: linear-gradient(135deg, #7daedc, #97c3ec);
+    }
+
+    .section-sina .section-badge {
+      background: linear-gradient(135deg, #f1a15b, #f7c28e);
+    }
+
+    .section-title-text {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .section-title-text h2 {
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+    }
+
+    .section-subtitle {
+      font-size: 12px;
+      color: var(--text-soft);
+      line-height: 1.6;
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    @media (min-width: 720px) {
+      .card-grid.two {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .card-grid.three {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    .card {
+      border-radius: var(--radius-md);
+      border: 1px dashed rgba(210, 170, 130, 0.7);
+      padding: 10px 11px;
+      background: var(--card-bg);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      position: relative;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.6), rgba(255, 245, 235, 0.9));
+      opacity: 0.45;
+      pointer-events: none;
+    }
+
+    .card-inner {
+      position: relative;
+      z-index: 1;
+    }
+
+    .card-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 6px;
+      margin-bottom: 4px;
+    }
+
+    .card-title {
+      font-size: 13px;
+      font-weight: 600;
+      word-break: break-all;
+    }
+
+    .card-index {
+      font-size: 11px;
+      color: var(--text-soft);
+      white-space: nowrap;
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-bottom: 4px;
+      margin-top: 2px;
+    }
+
+    .tag {
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(190, 160, 130, 0.5);
+      color: var(--text-soft);
+      background: rgba(255, 255, 255, 0.95);
+    }
+
+    .tag-main {
+      border-color: rgba(240, 160, 110, 0.9);
+      color: #c06a34;
+      background: rgba(245, 190, 130, 0.12);
+    }
+
+    .tag-group {
+      border-color: rgba(125, 168, 220, 0.85);
+      color: #4175b1;
+      background: rgba(125, 168, 220, 0.12);
+    }
+
+    .tag-series {
+      border-color: rgba(137, 180, 148, 0.85);
+      color: #4c7b5b;
+      background: rgba(137, 180, 148, 0.12);
+    }
+
+    .tag-safe {
+      border-color: rgba(222, 151, 151, 0.9);
+      color: #b15757;
+      background: rgba(229, 138, 138, 0.12);
+    }
+
+    .info-list {
+      list-style: none;
+      margin-top: 4px;
+      font-size: 11px;
+      color: var(--text-soft);
+      line-height: 1.7;
+    }
+
+    .info-list li {
+      display: flex;
+      gap: 4px;
+      align-items: baseline;
+    }
+
+    .info-label {
+      white-space: nowrap;
+    }
+
+    .info-value {
+      word-break: break-all;
+    }
+
+    .divider {
+      border-top: 1px dashed rgba(190, 160, 130, 0.5);
+      margin: 9px 0 6px;
+    }
+
+    .footer-note {
+      margin-top: 16px;
+      padding: 16px 14px 14px;
+      border-radius: var(--radius-lg);
+      border: 1px dashed rgba(210, 180, 150, 0.9);
+      background: rgba(255, 253, 249, 0.96);
+      color: var(--text-soft);
+      font-size: 12px;
+      line-height: 1.8;
+      text-align: left;
+      white-space: pre-line;
+    }
+
+    .footer-note em {
+      font-style: normal;
+      color: #b16735;
+    }
+
+    /* 小小页脚 */
+    footer.page-footer {
+      margin-top: 22px;
+      font-size: 11px;
+      color: var(--text-soft);
+      text-align: center;
+    }
+
+    footer.page-footer span.dot {
+      margin: 0 6px;
+      opacity: 0.55;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="page-header">
+      <div class="page-header-inner">
+        <div class="page-title-row">
+          <div class="page-icon">📚</div>
+          <h1 class="page-title">邮箱档案册</h1>
+        </div>
+        <p class="page-subtitle">
+奶杏底色、淡橙边线。
+把散落在数字世界里的名字，收入一册安静的簿。
+轻轻翻页，每一张卡片都是某段时间的自己。</p>
+        <div class="chips">
+          <div class="chip">奶杏底色 · 淡橙边线</div>
+          <div class="chip">OUTLOOK / GMAIL / QQ / iCloud</div>
+          <div class="chip">主邮箱 · 辅助邮箱 · 验证信息</div>
+        </div>
+      </div>
+    </header>
+
+    <nav class="top-nav">
+      <a href="#outlook" class="section-outlook"><span class="dot"></span>OUTLOOK · 卡片区</a>
+      <a href="#gmail" class="section-gmail"><span class="dot"></span>GMAIL · 卡片区</a>
+      <a href="#qqmail" class="section-qq"><span class="dot"></span>QQ 邮箱</a>
+      <a href="#apple" class="section-apple"><span class="dot"></span>苹果邮箱</a>
+      <a href="#aliyun" class="section-aliyun"><span class="dot"></span>阿里云邮箱</a>
+      <a href="#sina" class="section-sina"><span class="dot"></span>新浪邮箱</a>
+    </nav>
+
+    <!-- OUTLOOK -->
+    <section class="mail-section section-outlook" id="outlook">
+      <div class="section-header">
+        <div class="section-badge">
+          <span class="square"></span>
+          🟦 OUTLOOK
+        </div>
+        <div class="section-title-text">
+          <h2>OUTLOOK · 卡片区</h2>
+          <p class="section-subtitle">
+带着一点岛屿空气的浅色卡片。
+它们安静、规整，像是写给未来的备忘。</p>
+        </div>
+      </div>
+
+      <div class="card-grid">
+        <!-- 1 -->
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header-row">
+              <div class="card-title">① itspomme@outlook.com</div>
+              <div class="card-index">基础卡</div>
+            </div>
+            <div class="tags">
+              <span class="tag tag-group">别名组</span>
+            </div>
+            <ul class="info-list">
+              <li>
+                <span class="info-label">别名：</span>
+                <span class="info-value">itspomme1@outlook.com</span>
+              </li>
+              <li>
+                <span class="info-label"></span>
+                <span class="info-value">itspomme2@outlook.com</span>
+              </li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- 2 主邮箱卡 -->
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header-row">
+              <div class="card-title">② itspommehub@outlook.com</div>
+              <div class="card-index">主邮箱卡</div>
+            </div>
+            <div class="tags">
+              <span class="tag tag-main">主邮箱卡</span>
+              <span class="tag tag-group">别名组</span>
+            </div>
+            <ul class="info-list">
+              <li>
+                <span class="info-label">别名：</span>
+                <span class="info-value">itspommejava@outlook.com</span>
+              </li>
+              <li>
+                <span class="info-label"></span>
+                <span class="info-value">itspommedev@outlook.com</span>
+              </li>
+              <li>
+                <span class="info-label"></span>
+                <span class="info-value">itspommelab@outlook.com</span>
+              </li>
+              <li>
+                <span class="info-label"></span>
+                <span class="info-value">itspommeroot@outlook.com</span>
+              </li>
+            </ul>
+
+            <div class="divider"></div>
+
+            <ul class="info-list">
+              <li>
+                <span class="info-label">辅助邮箱：</span>
+                <span class="info-value">itspommehub@foxmail.com</span>
+              </li>
+              <li>
+                <span class="info-label">辅助电话：</span>
+                <span class="info-value">17625393442</span>
+              </li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- 3 -->
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header-row">
+              <div class="card-title">③ itspommehtml@outlook.com</div>
+              <div class="card-index">辅助卡</div>
+            </div>
+            <ul class="info-list">
+              <li>
+                <span class="info-label">辅助邮箱：</span>
+                <span class="info-value">itspommehub@foxmail.com</span>
+              </li>
+              <li>
+                <span class="info-label">辅助电话：</span>
+                <span class="info-value">17625293442</span>
+              </li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- 4 -->
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header-row">
+              <div class="card-title">④ itspommeweb@outlook.com</div>
+              <div class="card-index">辅助卡</div>
+            </div>
+            <ul class="info-list">
+              <li>
+                <span class="info-label">辅助邮箱：</span>
+                <span class="info-value">itspommehub@foxmail.com</span>
+              </li>
+              <li>
+                <span class="info-label">辅助电话：</span>
+                <span class="info-value">19026484584</span>
+              </li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- 5 系列邮箱 -->
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header-row">
+              <div class="card-title">⑤ itspomme(0 / 3 / 5 / 6 / 7 / 9 / x)@outlook.com</div>
+              <div class="card-index">系列卡</div>
+            </div>
+            <div class="tags">
+              <span class="tag tag-series">系列邮箱</span>
+            </div>
+            <ul class="info-list">
+              <li>
+                <span class="info-label">备注：</span>
+                <span class="info-value">系列邮箱：无独立备注。</span>
+              </li>
+            </ul>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- GMAIL -->
+    <section class="mail-section section-gmail" id="gmail">
+      <div class="section-header">
+        <div class="section-badge">
+          <span class="square"></span>
+          🟥 GMAIL
+        </div>
+        <div class="section-title-text">
+          <h2>GMAIL · 卡片区</h2>
+          <p class="section-subtitle">
+奶杏色偏暖，像黄昏时分的海平线。
+各自站在风里，却都通往你的生活。</p>
+        </div>
+      </div>
+
+      <div class="card-grid">
+        <!-- 1 -->
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header-row">
+              <div class="card-title">① itspommexyz@gmail.com</div>
+              <div class="card-index">验证 / Hub</div>
+            </div>
+            <div class="tags">
+              <span class="tag tag-safe">验证专用</span>
+            </div>
+            <ul class="info-list">
+              <li>
+                <span class="info-label">注册电话：</span>
+                <span class="info-value">17625293443</span>
+              </li>
+              <li>
+                <span class="info-label">辅助邮箱：</span>
+                <span class="info-value">itspommehub@foxmail.com</span>
+              </li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- 2 -->
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header-row">
+              <div class="card-title">② itspommedev@gmail.com</div>
+              <div class="card-index">开发向</div>
+            </div>
+            <ul class="info-list">
+              <li>
+                <span class="info-label">注册手机：</span>
+                <span class="info-value">无（iPad 注册）</span>
+              </li>
+              <li>
+                <span class="info-label">两步验证：</span>
+                <span class="info-value">19026484584</span>
+              </li>
+              <li>
+                <span class="info-label">辅助电话：</span>
+                <span class="info-value">19026484584</span>
+              </li>
+              <li>
+                <span class="info-label">辅助邮箱：</span>
+                <span class="info-value">itspommehub@foxmail.com</span>
+              </li>
+              <li>
+                <span class="info-label">辅助联系人：</span>
+                <span class="info-value">itspomme7@gmail.com</span>
+              </li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- 3 -->
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header-row">
+              <div class="card-title">③ itspommehtml@gmail.com</div>
+              <div class="card-index">HTML 向</div>
+            </div>
+            <ul class="info-list">
+              <li>
+                <span class="info-label">注册手机：</span>
+                <span class="info-value">18606275947</span>
+              </li>
+              <li>
+                <span class="info-label">两步验证：</span>
+                <span class="info-value">19026484584</span>
+              </li>
+              <li>
+                <span class="info-label">辅助电话：</span>
+                <span class="info-value">17625293442</span>
+              </li>
+              <li>
+                <span class="info-label">辅助邮箱：</span>
+                <span class="info-value">itspommehub@foxmail.com</span>
+              </li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- 4 -->
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header-row">
+              <div class="card-title">④ itspommeweb@gmail.com</div>
+              <div class="card-index">Web 向</div>
+            </div>
+            <ul class="info-list">
+              <li>
+                <span class="info-label">注册手机：</span>
+                <span class="info-value">19026484584</span>
+              </li>
+              <li>
+                <span class="info-label">两步验证：</span>
+                <span class="info-value">19026484584</span>
+              </li>
+              <li>
+                <span class="info-label">辅助电话：</span>
+                <span class="info-value">19026484584</span>
+              </li>
+              <li>
+                <span class="info-label">辅助邮箱：</span>
+                <span class="info-value">itspommehub@foxmail.com</span>
+              </li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- 5 -->
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header-row">
+              <div class="card-title">⑤ itspommejava@gmail.com</div>
+              <div class="card-index">Java 向</div>
+            </div>
+            <ul class="info-list">
+              <li>
+                <span class="info-label">注册电话：</span>
+                <span class="info-value">17625293442</span>
+              </li>
+              <li>
+                <span class="info-label">辅助联系人：</span>
+                <span class="info-value">itspommehub@gmail.com</span>
+              </li>
+              <li>
+                <span class="info-label">辅助电话：</span>
+                <span class="info-value">19026484584</span>
+              </li>
+              <li>
+                <span class="info-label">辅助邮箱：</span>
+                <span class="info-value">itspommehub@foxmail.com</span>
+              </li>
+              <li>
+                <span class="info-label">备用邮箱：</span>
+                <span class="info-value">itspommehub@foxail.com</span>
+              </li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- 6 -->
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header-row">
+              <div class="card-title">⑥ itspommelab@gmail.com</div>
+              <div class="card-index">Lab 向</div>
+            </div>
+            <ul class="info-list">
+              <li>
+                <span class="info-label">注册电话：</span>
+                <span class="info-value">13024543324</span>
+              </li>
+              <li>
+                <span class="info-label">辅助电话：</span>
+                <span class="info-value">19026484584</span>
+              </li>
+              <li>
+                <span class="info-label">辅助邮箱：</span>
+                <span class="info-value">itspommehub@gmail.com</span>
+              </li>
+              <li>
+                <span class="info-label">辅助联系人：</span>
+                <span class="info-value">itspomme7@gmail.com</span>
+              </li>
+              <li>
+                <span class="info-label">两步验证：</span>
+                <span class="info-value">19026484584</span>
+              </li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- 7 -->
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header-row">
+              <div class="card-title">⑧ itspommer@gmail.com</div>
+              <div class="card-index">个人向</div>
+            </div>
+            <ul class="info-list">
+              <li>
+                <span class="info-label">注册电话：</span>
+                <span class="info-value">17625293442</span>
+              </li>
+              <li>
+                <span class="info-label">密码：</span>
+                <span class="info-value">6z...127</span>
+              </li>
+              <li>
+                <span class="info-label">两步验证：</span>
+                <span class="info-value">17625293442</span>
+              </li>
+              <li>
+                <span class="info-label">辅助电话：</span>
+                <span class="info-value">17625293442</span>
+              </li>
+              <li>
+                <span class="info-label">辅助邮箱：</span>
+                <span class="info-value">itspommehub@foxmail.com</span>
+              </li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- 8 -->
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header-row">
+              <div class="card-title">⑨ itspomm7@gmail.com</div>
+              <div class="card-index">系列卡</div>
+            </div>
+            <ul class="info-list">
+              <li>
+                <span class="info-label">两步验证：</span>
+                <span class="info-value">19026484584</span>
+              </li>
+              <li>
+                <span class="info-label">辅助电话：</span>
+                <span class="info-value">19026484584</span>
+              </li>
+              <li>
+                <span class="info-label">辅助邮箱：</span>
+                <span class="info-value">itspommehub@foxmail.com</span>
+              </li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- 9 -->
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header-row">
+              <div class="card-title">⑩ itspommx@gmail.com</div>
+              <div class="card-index">系列卡</div>
+            </div>
+            <ul class="info-list">
+              <li>
+                <span class="info-label">注册电话：</span>
+                <span class="info-value">17625393442</span>
+              </li>
+              <li>
+                <span class="info-label">密码：</span>
+                <span class="info-value">6z...127</span>
+              </li>
+              <li>
+                <span class="info-label">两步验证：</span>
+                <span class="info-value">17625393442</span>
+              </li>
+              <li>
+                <span class="info-label">辅助电话：</span>
+                <span class="info-value">17625293442</span>
+              </li>
+              <li>
+                <span class="info-label">辅助邮箱：</span>
+                <span class="info-value">itspommehub@foxmail.com</span>
+              </li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- 10 -->
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header-row">
+              <div class="card-title">⑪ itspomme0@gmail.com</div>
+              <div class="card-index">系列卡</div>
+            </div>
+            <ul class="info-list">
+              <li>
+                <span class="info-label">辅助电话：</span>
+                <span class="info-value">19026484584</span>
+              </li>
+              <li>
+                <span class="info-label">辅助邮箱：</span>
+                <span class="info-value">itspommehub@foxmail.com</span>
+              </li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- 11 -->
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header-row">
+              <div class="card-title">⑫ itspomme1@gmail.com</div>
+              <div class="card-index">系列卡</div>
+            </div>
+            <ul class="info-list">
+              <li>
+                <span class="info-label">两步验证：</span>
+                <span class="info-value">17625393442</span>
+              </li>
+              <li>
+                <span class="info-label">辅助电话：</span>
+                <span class="info-value">17625293442</span>
+              </li>
+              <li>
+                <span class="info-label">辅助邮箱：</span>
+                <span class="info-value">itspommehub@foxmail.com</span>
+              </li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- 12 -->
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header-row">
+              <div class="card-title">⑬itspomme2@gmail.com</div>
+              <div class="card-index">系列卡</div>
+            </div>
+            <ul class="info-list">
+              <li>
+                <span class="info-label">两步验证：</span>
+                <span class="info-value">17625393442</span>
+              </li>
+              <li>
+                <span class="info-label">辅助电话：</span>
+                <span class="info-value">17625293442</span>
+              </li>
+              <li>
+                <span class="info-label">辅助邮箱：</span>
+                <span class="info-value">itspommehub@foxmail.com</span>
+              </li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- 13 -->
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header-row">
+              <div class="card-title">⑭ itspomme3@gmail.com</div>
+              <div class="card-index">系列卡</div>
+            </div>
+            <ul class="info-list">
+              <li>
+                <span class="info-label">两步验证：</span>
+                <span class="info-value">17625393442</span>
+              </li>
+              <li>
+                <span class="info-label">辅助电话：</span>
+                <span class="info-value">17625293442</span>
+              </li>
+              <li>
+                <span class="info-label">辅助邮箱：</span>
+                <span class="info-value">itspommehub@foxmail.com</span>
+              </li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- 14 -->
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header-row">
+              <div class="card-title">⑮ itspomme6@gmail.com</div>
+              <div class="card-index">系列卡</div>
+            </div>
+            <ul class="info-list">
+              <li>
+                <span class="info-label">两步验证：</span>
+                <span class="info-value">19026484584</span>
+              </li>
+              <li>
+                <span class="info-label">辅助电话：</span>
+                <span class="info-value">19026484584</span>
+              </li>
+              <li>
+                <span class="info-label">辅助邮箱：</span>
+                <span class="info-value">itspommehub@foxmail.com</span>
+              </li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- 15 -->
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header-row">
+              <div class="card-title">⑯ itspomme9@gmail.com</div>
+              <div class="card-index">系列卡</div>
+            </div>
+            <ul class="info-list">
+              <li>
+                <span class="info-label">两步验证：</span>
+                <span class="info-value">19026484584</span>
+              </li>
+              <li>
+                <span class="info-label">辅助电话：</span>
+                <span class="info-value">19026484584</span>
+              </li>
+              <li>
+                <span class="info-label">辅助邮箱：</span>
+                <span class="info-value">itspommehub@foxmail.com</span>
+              </li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- 16 -->
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header-row">
+              <div class="card-title">⑰ itsElmasss@gmail.com</div>
+              <div class="card-index">系列卡</div>
+            </div>
+            <ul class="info-list">
+              <li>
+                <span class="info-label">两步验证：</span>
+                <span class="info-value">19026484584</span>
+              </li>
+              <li>
+                <span class="info-label">辅助电话：</span>
+                <span class="info-value">19026484584</span>
+              </li>
+              <li>
+                <span class="info-label">辅助邮箱：</span>
+                <span class="info-value">itspommehub@foxmail.com</span>
+              </li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- 17 -->
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header-row">
+              <div class="card-title">⑱ itspomme11@gmail.com</div>
+              <div class="card-index">系列卡</div>
+            </div>
+            <ul class="info-list">
+              <li>
+                <span class="info-label">两步验证：</span>
+                <span class="info-value">19026484584</span>
+              </li>
+              <li>
+                <span class="info-label">辅助电话：</span>
+                <span class="info-value">19026484584</span>
+              </li>
+              <li>
+                <span class="info-label">辅助邮箱：</span>
+                <span class="info-value">itspommehub@foxmail.com</span>
+              </li>
+            </ul>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- QQ 邮箱 -->
+    <section class="mail-section section-qq" id="qqmail">
+      <div class="section-header">
+        <div class="section-badge">
+          <span class="square"></span>
+          🟩 QQ 邮箱
+        </div>
+        <div class="section-title-text">
+          <h2>QQ 邮箱 · 抽屉区</h2>
+          <p class="section-subtitle">
+这些账号像编号的抽屉。
+推开，每一格都有独立的小世界。</p>
+        </div>
+      </div>
+
+      <div class="card-grid two">
+        <!-- 1 -->
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header-row">
+              <div class="card-title">① 1071898008</div>
+              <div class="card-index">Hub</div>
+            </div>
+            <ul class="info-list">
+              <li>
+                <span class="info-label">foxmail：</span>
+                <span class="info-value">itspommehub@foxmail.com</span>
+              </li>
+              <li>
+                <span class="info-label">qq：</span>
+                <span class="info-value">itspommehub@qq.com</span>
+              </li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- 2 -->
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header-row">
+              <div class="card-title">② 2422639949</div>
+              <div class="card-index">j 向</div>
+            </div>
+            <ul class="info-list">
+              <li>
+                <span class="info-label">foxmail：</span>
+                <span class="info-value">itspommej@foxmail.com</span>
+              </li>
+              <li>
+                <span class="info-label">qq：</span>
+                <span class="info-value">itspomme@qq.com</span>
+              </li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- 3 -->
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header-row">
+              <div class="card-title">③ 417564454</div>
+              <div class="card-index">Java 向</div>
+            </div>
+            <ul class="info-list">
+              <li>
+                <span class="info-label">foxmail：</span>
+                <span class="info-value">itspommejava@foxmail.com</span>
+              </li>
+              <li>
+                <span class="info-label">qq：</span>
+                <span class="info-value">itspommejava@qq.com</span>
+              </li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- 4 -->
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header-row">
+              <div class="card-title">④ 192988337</div>
+              <div class="card-index">Lab 向</div>
+            </div>
+            <ul class="info-list">
+              <li>
+                <span class="info-label">foxmail：</span>
+                <span class="info-value">itspommelab@foxmail.com</span>
+              </li>
+              <li>
+                <span class="info-label">fqq：</span>
+                <span class="info-value">itspommelab@fqq.com</span>
+              </li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- 5 -->
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header-row">
+              <div class="card-title">⑤ 3325819877</div>
+              <div class="card-index">7 向</div>
+            </div>
+            <ul class="info-list">
+              <li>
+                <span class="info-label">foxmail：</span>
+                <span class="info-value">itspomme7@foxmail.com</span>
+              </li>
+              <li>
+                <span class="info-label">qq：</span>
+                <span class="info-value">itspomme7@qq.com</span>
+              </li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- 6 -->
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header-row">
+              <div class="card-title">⑥ 3761652021</div>
+              <div class="card-index">Web 向</div>
+            </div>
+            <ul class="info-list">
+              <li>
+                <span class="info-label">foxmail：</span>
+                <span class="info-value">itspommeweb@foxmail.com</span>
+              </li>
+              <li>
+                <span class="info-label">qq：</span>
+                <span class="info-value">itspommeweb@qq.com</span>
+              </li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- 7 -->
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header-row">
+              <div class="card-title">⑦ 3908079020</div>
+              <div class="card-index">HTML 向</div>
+            </div>
+            <ul class="info-list">
+              <li>
+                <span class="info-label">foxmail：</span>
+                <span class="info-value">itspommehtml@foxmail.com</span>
+              </li>
+              <li>
+                <span class="info-label">qq：</span>
+                <span class="info-value">itspommehtml@qq.com</span>
+              </li>
+            </ul>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- 苹果邮箱 -->
+    <section class="mail-section section-apple" id="apple">
+      <div class="section-header">
+        <div class="section-badge">
+          <span class="square"></span>
+          🍏 苹果邮箱
+        </div>
+        <div class="section-title-text">
+          <h2>苹果邮箱 · 云端灯塔</h2>
+          <p class="section-subtitle">
+这里的每一个地址，都像云里的灯塔。</p>
+        </div>
+      </div>
+
+      <div class="card-grid">
+        <!-- Apple ID -->
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header-row">
+              <div class="card-title">Apple ID：itspomme@outlook.com（汽水）</div>
+              <div class="card-index">Apple ID</div>
+            </div>
+            <ul class="info-list">
+              <li>
+                <span class="info-label">登录入口：</span>
+                <span class="info-value">https://www.icloud.com.cn/mail/</span>
+              </li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- iCloud 系列 -->
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header-row">
+              <div class="card-title">iCloud 系列</div>
+              <div class="card-index">云端</div>
+            </div>
+            <ul class="info-list">
+              <li>
+                <span class="info-label">iCloud：</span>
+                <span class="info-value">itspomme@icloud.com</span>
+              </li>
+              <li>
+                <span class="info-label"></span>
+                <span class="info-value">itspommehub@icloud.com</span>
+              </li>
+              <li>
+                <span class="info-label"></span>
+                <span class="info-value">itspommedev@icloud.com</span>
+              </li>
+              <li>
+                <span class="info-label"></span>
+                <span class="info-value">itspommeroot@icloud.com</span>
+              </li>
+            </ul>
+            <div class="divider"></div>
+            <ul class="info-list">
+              <li>
+                <span class="info-label">系列：</span>
+                <span class="info-value">itspomme(369)@icloud.com</span>
+              </li>
+            </ul>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- 阿里云 -->
+    <section class="mail-section section-aliyun" id="aliyun">
+      <div class="section-header">
+        <div class="section-badge">
+          <span class="square"></span>
+          🟦 阿里云邮箱
+        </div>
+        <div class="section-title-text">
+          <h2>阿里云邮箱</h2>
+        </div>
+      </div>
+
+      <div class="card-grid two">
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header-row">
+              <div class="card-title">itspomme@aliyun.com</div>
+              <div class="card-index">阿里云</div>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header-row">
+              <div class="card-title">itspomme7@aliyun.com</div>
+              <div class="card-index">阿里云</div>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- 新浪 -->
+    <section class="mail-section section-sina" id="sina">
+      <div class="section-header">
+        <div class="section-badge">
+          <span class="square"></span>
+          🟧 新浪邮箱
+        </div>
+        <div class="section-title-text">
+          <h2>新浪邮箱</h2>
+        </div>
+      </div>
+
+      <div class="card-grid three">
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header-row">
+              <div class="card-title">itspomme@sina.com</div>
+              <div class="card-index">新浪</div>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header-row">
+              <div class="card-title">itspommex@sina.com</div>
+              <div class="card-index">新浪</div>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header-row">
+              <div class="card-title">itspomme7@sina.com</div>
+              <div class="card-index">新浪</div>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-inner">
+            <div class="card-header-row">
+              <div class="card-title">itspommes@sina.com</div>
+              <div class="card-index">新浪</div>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- 尾页 -->
+    <section class="mail-section" id="tail">
+      <div class="section-header">
+        <div class="section-badge" style="background: linear-gradient(135deg,#d8c0a8,#f2d3af); color:#655547;">
+          <span class="square"></span>
+          🌾 尾页 · 轻轻一语
+        </div>
+      </div>
+
+      <div class="footer-note">
+把这么多名字放在一起，
+像把走过的路理了一遍。
+愿每一个邮箱，都为你打开一扇小小的、<em>温柔的窗</em>。
+      </div>
+    </section>
+
+    <footer class="page-footer">
+      <span>itspomme · 邮箱档案册</span>
+      <span class="dot">·</span>
+      <span>整理时间：自己知道就好</span>
+    </footer>
+  </div>
+</body>
+</html>
+
+
