@@ -401,6 +401,85 @@
       margin: 0 6px;
       opacity: 0.55;
     }
+
+    /* 隐藏顶部说明标签与卡片右侧辅助标签 */
+    .chips,
+    .card-index {
+      display: none !important;
+    }
+
+    .card-header-row {
+      align-items: center;
+    }
+
+    .card-title,
+    .info-value {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-width: 0;
+    }
+
+    .copy-btn {
+      flex: 0 0 auto;
+      width: 24px;
+      height: 24px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(190, 135, 82, 0.18);
+      background: rgba(255, 250, 245, 0.58);
+      color: rgba(154, 98, 59, 0.62);
+      border-radius: 999px;
+      padding: 0;
+      cursor: pointer;
+      box-shadow: 0 2px 7px rgba(180, 140, 100, 0.06);
+      opacity: 0.78;
+      -webkit-tap-highlight-color: transparent;
+      transition: transform 0.15s ease, opacity 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .copy-btn svg {
+      width: 13px;
+      height: 13px;
+      stroke: currentColor;
+    }
+
+    .copy-btn:active {
+      transform: scale(0.96);
+      opacity: 0.96;
+      background: rgba(255, 247, 239, 0.88);
+      box-shadow: 0 2px 8px rgba(180, 140, 100, 0.10);
+    }
+
+    .card-title .copy-btn {
+      margin-left: 6px;
+      vertical-align: middle;
+    }
+
+    .copy-toast {
+      position: fixed;
+      left: 50%;
+      bottom: 28px;
+      transform: translateX(-50%);
+      padding: 8px 13px;
+      border-radius: 999px;
+      background: rgba(75, 70, 63, 0.88);
+      color: #fffaf5;
+      font-size: 12px;
+      letter-spacing: 0.02em;
+      box-shadow: 0 10px 24px rgba(80, 60, 40, 0.22);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.18s ease, bottom 0.18s ease;
+      z-index: 999;
+    }
+
+    .copy-toast.show {
+      opacity: 1;
+      bottom: 36px;
+    }
+
   </style>
 </head>
 <body>
@@ -415,11 +494,6 @@
 奶杏底色、淡橙边线。
 把散落在数字世界里的名字，收入一册安静的簿。
 轻轻翻页，每一张卡片都是某段时间的自己。</p>
-        <div class="chips">
-          <div class="chip">奶杏底色 · 淡橙边线</div>
-          <div class="chip">OUTLOOK / GMAIL / QQ / iCloud</div>
-          <div class="chip">主邮箱 · 辅助邮箱 · 验证信息</div>
-        </div>
       </div>
     </header>
 
@@ -1474,6 +1548,66 @@
       <span>整理时间：自己知道就好</span>
     </footer>
   </div>
+<script>
+  (function () {
+    const emailRegex = /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/;
+    const numberedTitleRegex = /^[①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳㉑㉒㉓㉔㉕㉖㉗㉘㉙㉚]/;
+
+    function showToast(text) {
+      let toast = document.querySelector('.copy-toast');
+      if (!toast) {
+        toast = document.createElement('div');
+        toast.className = 'copy-toast';
+        document.body.appendChild(toast);
+      }
+      toast.textContent = text;
+      toast.classList.add('show');
+      clearTimeout(window.__copyToastTimer);
+      window.__copyToastTimer = setTimeout(() => {
+        toast.classList.remove('show');
+      }, 1300);
+    }
+
+    function copyText(text) {
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text).then(() => showToast('已复制'));
+      } else {
+        const input = document.createElement('textarea');
+        input.value = text;
+        input.style.position = 'fixed';
+        input.style.opacity = '0';
+        document.body.appendChild(input);
+        input.select();
+        document.execCommand('copy');
+        input.remove();
+        showToast('已复制');
+      }
+    }
+
+    document.querySelectorAll('.card-title').forEach(el => {
+      const text = el.textContent.trim();
+      const match = text.match(emailRegex);
+      const inSimpleMailSection = !!el.closest('#aliyun, #sina');
+      if ((!numberedTitleRegex.test(text) && !inSimpleMailSection) || !match || el.querySelector('.copy-btn')) return;
+
+      const email = match[0];
+      const btn = document.createElement('button');
+      btn.className = 'copy-btn';
+      btn.type = 'button';
+      btn.setAttribute('aria-label', '复制 ' + email);
+      btn.dataset.copy = email;
+      btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="8" y="8" width="10" height="10" rx="2" stroke-width="1.8"/><path d="M6 16H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" stroke-width="1.8" stroke-linecap="round"/></svg>';
+      btn.addEventListener('click', function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        copyText(email);
+      });
+
+      el.appendChild(btn);
+    });
+  })();
+</script>
+
 </body>
 </html>
 
